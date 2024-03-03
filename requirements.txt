@@ -1,0 +1,9 @@
+Flask
+Flask-SQLAlchemy
+Authlib
+confluent-kafka
+psycopg2-binary
+FastAPI
+uvicorn
+httpx
+pyjwt
