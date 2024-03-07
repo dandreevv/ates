@@ -1,7 +1,7 @@
 ## Бизнес процессы через Event Storming
 Miro - https://miro.com/app/board/uXjVNoo4Ga8=/?share_link_id=937426585289
 
-![Схема Event Storming](EventStorming.jpg)
+<img src="EventStorming.png" alt="image" width="500" height="auto">
 
 ## Модель данных
 
