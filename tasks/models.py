@@ -15,13 +15,15 @@ class User(Base):
     tasks = relationship("Task", back_populates="assigner")
 
 
-class Tasks(Base):
+class Task(Base):
     __tablename__ = "tasks"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    public_id = Column(UUID, unique=True)
     title = Column(String, index=True)
     assigner_id = Column(Integer, ForeignKey("users.id"))
     status = Column(Text, nullable=False)
     created_at = Column(TIMESTAMP)
+    created_by = Column(Integer, ForeignKey("users.id"))
 
     assigner = relationship("User", back_populates="tasks")

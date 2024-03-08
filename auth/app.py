@@ -19,11 +19,11 @@ def create_app(config=None):
             app.config.update(config)
         elif config.endswith('.py'):
             app.config.from_pyfile(config)
-    app.config.update(
-        {
-            "SESSION_COOKIE_SAMESITE": "Lax"
-        }
-    )
+    # app.config.update(
+    #     {
+    #         "SESSION_COOKIE_SAMESITE": "Lax"
+    #     }
+    # )
     setup_app(app)
     return app
 

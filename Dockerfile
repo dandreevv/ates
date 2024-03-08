@@ -6,4 +6,4 @@ RUN pip install -r requirements.txt
 
 ENV PYTHONPATH=/usr/src/app
 
-CMD ["flask", "--app", "apps.auth.app", "run"]
+CMD ["python", "tasks/main.py"]

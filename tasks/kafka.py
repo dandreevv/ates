@@ -1,16 +1,25 @@
 import asyncio
 import functools
 import os
-from apps.tasks import crud
+
+from confluent_kafka import Producer
+
+from tasks import crud
 
 import confluent_kafka
 
-from apps.tasks.db import get_db
+from tasks.dependencies import get_db
 
 kafka_actions = {
     "accounts": crud.add_user,
     "accounts.updated": crud.update_user,
 }
+
+producer = Producer(
+    {
+        "bootstrap.servers": os.environ["KAFKA_BOOTSTRAP_SERVERS"],
+    }
+)
 
 
 async def consume(topics):

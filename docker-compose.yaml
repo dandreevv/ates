@@ -3,27 +3,31 @@ version: "3"
 services:
   ates-auth:
     image: ates-auth-image
+    build: .
     container_name: ates-auth
     ports:
       - "5000:5000"
     environment:
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_BOOTSTRAP_SERVERS: ates-kafka:9092
       DB_URL: postgresql://${DB_USER}:${DB_PASSWORD}@ates-auth-db:${DB_PORT}/${DB_NAME}
     depends_on:
       - ates-kafka
       - ates-auth-db
+    command: flask --app auth.app run -h 0.0.0.0
 
   ates-tasks:
     image: ates-tasks-image
     container_name: ates-tasks
+    build: .
     ports:
       - "8000:8000"
     environment:
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      DB_URL: postgresql://${DB_USER}:${DB_PASSWORD}@ates-auth-db:6432/${DB_NAME}
+      KAFKA_BOOTSTRAP_SERVERS: ates-kafka:9092
+      DB_URL: postgresql://${DB_USER}:${DB_PASSWORD}@ates-tasks-db:5432/${DB_NAME}
     depends_on:
       - ates-kafka
       - ates-tasks-db
+    command: python tasks/main.py
 
   ates-auth-db:
     image: postgres:16
