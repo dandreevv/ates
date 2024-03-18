@@ -1,4 +1,3 @@
-import json
 import time
 import uuid
 
@@ -8,10 +7,9 @@ from werkzeug.security import gen_salt
 from authlib.integrations.flask_oauth2 import current_token
 from authlib.oauth2 import OAuth2Error
 
-from .kafka import producer
+from .kafka import send_user
 from .models import db, User, OAuth2Client
 from .oauth2 import authorization, require_oauth
-
 
 bp = Blueprint('home', __name__)
 
@@ -37,10 +35,11 @@ def home():
             db.session.add(user)
             db.session.commit()
             data = {
+                "email": user.email,
                 "public_id": str(user.public_id),
                 "role": role,
             }
-            producer.produce('accounts.updated', json.dumps(data))
+            send_user(data)
         else:
             email = request.form.get('email')
             password = request.form.get('password')
@@ -50,13 +49,12 @@ def home():
                 data = {
                     "email": email,
                     "public_id": str(uuid.uuid4()),
-                    "password": password,
                     "role": role,
                 }
-                user = User(**data)
+                user = User(**data, password=password)
                 db.session.add(user)
                 db.session.commit()
-                producer.produce('accounts', json.dumps(data))
+                send_user(data)
             session['id'] = user.id
             # if user is not just to log in, but need to head back to the auth page, then go for it
             next_page = request.args.get('next')
