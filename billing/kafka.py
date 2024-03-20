@@ -60,8 +60,9 @@ def send_costed_task(task: Task):
         "event_time": datetime.now().strftime("%y-%m-%d %H:%M:%s"),
         "producer": "task",
         "data": {
-            "assigner_pub_id": assigner.public_id,
-            "task_pub_id": task.public_id,
+            "public_id": task.public_id,
+            "fee": task.fee,
+            "cost": task.cost,
         },
     }
     validate_event('billing.costed', data)

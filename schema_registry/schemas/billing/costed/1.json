@@ -26,7 +26,6 @@
       },
       "required": [
         "public_id",
-        "status",
         "fee",
         "cost"
       ]
