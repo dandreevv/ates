@@ -1,6 +1,6 @@
 import asyncio
-import json
 import os
+import random
 import uuid
 from contextlib import asynccontextmanager
 import jwt
@@ -13,7 +13,7 @@ from starlette.requests import Request
 
 from tasks import crud
 from tasks.dependencies import get_user, get_db
-from tasks.kafka import consume, producer
+from tasks.kafka import consume, send_cud_task, send_assigned_task, send_done_task
 from tasks.models import Base, Task, User
 from tasks.db import engine
 
@@ -90,13 +90,8 @@ def create_tasks(request: Request, user: User = Depends(get_user), db: Session =
     }
     task = Task(**data)
     crud.add_task(db, task)
-    producer.produce('tasks', json.dumps({"assigner_pub_id": assigner.public_id, **data}))
-    producer.produce('tasks.assigned', json.dumps(
-        {
-            "assigner_pub_id": assigner.public_id,
-            "task_pub_id": task.public_id,
-        },
-    ))
+    send_cud_task(task)
+    send_assigned_task(task, assigner)
     return
 
 
@@ -108,12 +103,7 @@ def done_tasks(task_id: int, user: User = Depends(get_user), db: Session = Depen
     task.status = "done"
     db.commit()
     assigner = crud.get_user_by_id(db, task.assigner_id)
-    producer.produce('tasks.done', json.dumps(
-        {
-            "assigner_pub_id": assigner.public_id,
-            "task_pub_id": task.public_id,
-        },
-    ))
+    send_done_task(task, assigner)
     return
 
 
@@ -125,12 +115,7 @@ def shuffle_tasks(user: User = Depends(get_user), db: Session = Depends(get_db))
     for task in tasks:
         assigner = crud.find_random_developer(db)
         task.assigner_id = assigner.id
-        producer.produce('tasks.assigned', json.dumps(
-            {
-                "assigner_pub_id": assigner.public_id,
-                "task_pub_id": task.public_id,
-            },
-        ))
+        send_assigned_task(task, assigner)
     db.commit()
     return
 

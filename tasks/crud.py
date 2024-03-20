@@ -10,11 +10,13 @@ def get_user_by_id(db: Session, user_id: int):
 
 
 def add_user(db: Session, data: dict):
-    db_user = models.User(**data)
-    db.add(db_user)
+    user = db.query(models.User).filter(models.User.public_id == data["public_id"]).first()
+    if user is None:
+        db_user = models.User(**data)
+        db.add(db_user)
+    else:
+        user.role = data["role"]
     db.commit()
-    db.refresh(db_user)
-    return db_user
 
 
 def update_user(db: Session, data: dict):

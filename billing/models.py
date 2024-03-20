@@ -12,8 +12,6 @@ class User(Base):
     email = Column(Text, unique=True)
     role = Column(Text)
 
-    tasks = relationship("Task", back_populates="assigner")
-
 
 class Task(Base):
     __tablename__ = "tasks"
@@ -21,9 +19,16 @@ class Task(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     public_id = Column(UUID, unique=True)
     title = Column(String, index=True)
-    assigner_id = Column(Integer, ForeignKey("users.id"))
-    status = Column(Text, nullable=False)
+    fee = Column(Integer)
+    cost = Column(Integer)
     created_at = Column(TIMESTAMP)
-    created_by = Column(Integer, ForeignKey("users.id"))
 
-    assigner = relationship("User", back_populates="tasks")
+
+class Transaction(Base):
+    __tablename__ = "transactions"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    assigner_id = Column(Integer, ForeignKey("users.id"))
+    task_id = Column(Integer, ForeignKey("tasks.id"))
+    type = Column(String)
+    created_at = Column(TIMESTAMP)

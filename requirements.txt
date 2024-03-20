@@ -7,3 +7,4 @@ FastAPI
 uvicorn
 httpx
 pyjwt
+jsonschema
